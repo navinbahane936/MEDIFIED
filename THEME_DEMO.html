@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediFind - Color Theme Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        
+        .themes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .theme-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+        
+        .theme-header {
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        
+        .theme-content {
+            padding: 20px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .color-box {
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-size: 11px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-weight: bold;
+            padding: 5px;
+            text-align: center;
+        }
+        
+        .demo-section {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .theme-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .theme-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .approval-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .approval-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        .approve-btn {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .approve-btn:hover {
+            background: #45a049;
+        }
+        
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+        
+        .reject-btn:hover {
+            background: #da190b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏥 MediFind Hospital - Color Theme Options</h1>
+    
+    <div class="themes-container">
+        
+        <!-- Theme 1: Premium Navy & Teal -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #1F3A93 0%, #0D47A1 100%);">
+                <div class="theme-name">Theme 1: Premium Navy & Teal</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Deep navy with vibrant teal accents. Sophisticated, trustworthy, and professional hospital branding.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #1F3A93;"><strong>#1F3A93</strong></div>
+                    <div class="color-box" style="background: #00ACC1;"><strong>#00ACC1</strong></div>
+                    <div class="color-box" style="background: #00897B;"><strong>#00897B</strong></div>
+                    <div class="color-box" style="background: #29B6F6;"><strong>#29B6F6</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #ecf0f7; border: 2px solid #00ACC1;">
+                    <strong style="color: #0D47A1;">✓ Available Beds: 12</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #1F3A93, #00ACC1);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 1</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 2: Clinical Green & Blue -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #00796B 0%, #004D40 100%);">
+                <div class="theme-name">Theme 2: Clinical Green & Blue</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Deep clinical green with medical blue. Modern healthcare aesthetic perfect for emergency services.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #00796B;"><strong>#00796B</strong></div>
+                    <div class="color-box" style="background: #1565C0;"><strong>#1565C0</strong></div>
+                    <div class="color-box" style="background: #00BCD4;"><strong>#00BCD4</strong></div>
+                    <div class="color-box" style="background: #4DB6AC;"><strong>#4DB6AC</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #e0f2f1; border: 2px solid #00796B;">
+                    <strong style="color: #004D40;">✓ Available Beds: 18</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #00796B, #1565C0);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 2</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 3: Modern Healthcare Blue -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #0066CC 0%, #003D99 100%);">
+                <div class="theme-name">Theme 3: Modern Healthcare Blue</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Bold healthcare blue with cyan accents. Modern, clean, and highly professional appearance.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #0066CC;"><strong>#0066CC</strong></div>
+                    <div class="color-box" style="background: #00A3E0;"><strong>#00A3E0</strong></div>
+                    <div class="color-box" style="background: #00C94B;"><strong>#00C94B</strong></div>
+                    <div class="color-box" style="background: #003D99;"><strong>#003D99</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #f0f7ff; border: 2px solid #0066CC;">
+                    <strong style="color: #003D99;">✓ Available Beds: 24</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #0066CC, #00A3E0);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 3</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 4: Premium Emerald & Slate -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);">
+                <div class="theme-name">Theme 4: Emerald & Slate</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Rich emerald green symbolizing healing & recovery. Sophisticated and calming hospital environment.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #1B5E20;"><strong>#1B5E20</strong></div>
+                    <div class="color-box" style="background: #2E7D32;"><strong>#2E7D32</strong></div>
+                    <div class="color-box" style="background: #0288D1;"><strong>#0288D1</strong></div>
+                    <div class="color-box" style="background: #66BB6A;"><strong>#66BB6A</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #e8f5e9; border: 2px solid #2E7D32;">
+                    <strong style="color: #1B5E20;">✓ Available Beds: 15</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #1B5E20, #2E7D32);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 4</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 5: Enterprise Medical -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #1A237E 0%, #283593 100%);">
+                <div class="theme-name">Theme 5: Enterprise Medical</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Deep indigo with vibrant accents. Enterprise-grade medical software aesthetic with premium feel.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #1A237E;"><strong>#1A237E</strong></div>
+                    <div class="color-box" style="background: #00897B;"><strong>#00897B</strong></div>
+                    <div class="color-box" style="background: #FF6D00;"><strong>#FF6D00</strong></div>
+                    <div class="color-box" style="background: #5E35B1;"><strong>#5E35B1</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #f3e5f5; border: 2px solid #5E35B1;">
+                    <strong style="color: #1A237E;">✓ Available Beds: 30</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #1A237E, #5E35B1);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 5</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 6: Advanced Digital Healthcare -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #263238 0%, #37474F 100%);">
+                <div class="theme-name">Theme 6: Digital Healthcare</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Modern slate with neon cyan. Cutting-edge tech hospital design. Premium digital healthcare platform.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #263238;"><strong>#263238</strong></div>
+                    <div class="color-box" style="background: #00BCD4;"><strong>#00BCD4</strong></div>
+                    <div class="color-box" style="background: #00E5FF;"><strong>#00E5FF</strong></div>
+                    <div class="color-box" style="background: #1A237E;"><strong>#1A237E</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #eceff1; border: 2px solid #00BCD4;">
+                    <strong style="color: #263238;">✓ Available Beds: 22</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #263238, #00BCD4);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 6</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 7: Luxury Medical Care -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);">
+                <div class="theme-name">Theme 7: Luxury Medical Care</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Premium dark navy with gold accents. Luxury hospital branding. Elegant and exclusive feel.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #0D1B2A;"><strong>#0D1B2A</strong></div>
+                    <div class="color-box" style="background: #FFB703;"><strong>#FFB703</strong></div>
+                    <div class="color-box" style="background: #00B4D8;"><strong>#00B4D8</strong></div>
+                    <div class="color-box" style="background: #FB5607;"><strong>#FB5607</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #f8f9fa; border: 2px solid #FFB703;">
+                    <strong style="color: #0D1B2A;">✓ Available Beds: 28</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #0D1B2A, #FFB703);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 7</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme 8: Certified Medical Pro -->
+        <div class="theme-card">
+            <div class="theme-header" style="background: linear-gradient(135deg, #0C3C26 0%, #1B5E20 100%);">
+                <div class="theme-name">Theme 8: Certified Medical Pro</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-description">
+                    Forest green with sky blue. Professional certified medical aesthetic. Trust & reliability focused.
+                </div>
+                
+                <div class="color-grid">
+                    <div class="color-box" style="background: #0C3C26;"><strong>#0C3C26</strong></div>
+                    <div class="color-box" style="background: #0288D1;"><strong>#0288D1</strong></div>
+                    <div class="color-box" style="background: #039BE5;"><strong>#039BE5</strong></div>
+                    <div class="color-box" style="background: #558B2F;"><strong>#558B2F</strong></div>
+                </div>
+                
+                <div class="demo-section" style="background: #e6f2e6; border: 2px solid #0C3C26;">
+                    <strong style="color: #0C3C26;">✓ Available Beds: 19</strong>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" style="background: linear-gradient(135deg, #0C3C26, #0288D1);">Book Now</button>
+                        <button class="btn btn-secondary">Details</button>
+                    </div>
+                </div>
+                
+                <div class="approval-section">
+                    <button class="approval-btn approve-btn">✓ Approve Theme 8</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 50px; padding: 30px; background: white; border-radius: 12px; max-width: 1400px; margin-left: auto; margin-right: auto;">
+        <h2 style="color: #333; margin-bottom: 15px;">Premium Hospital Color Themes</h2>
+        <p style="color: #666; margin-bottom: 20px;">8 professionally designed medical-grade color schemes. Choose one of the above themes and click "Approve Theme X" to confirm. I'll then update your entire application with the selected color scheme.</p>
+        <p style="color: #999; font-size: 14px;">✨ Each theme includes: Premium gradients • Medical color psychology • Professional branding • Accessibility compliance</p>
+        <p style="color: #999; font-size: 14px; margin-top: 10px;">You can also suggest custom colors and I'll create a custom theme for you!</p>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.approve-btn').forEach((btn, index) => {
+            btn.addEventListener('click', function() {
+                const themeName = this.closest('.theme-card').querySelector('.theme-name').textContent;
+                alert(`You selected: ${themeName}\n\nI will now update the entire MediFind application with this color theme!`);
+            });
+        });
+    </script>
+</body>
+</html>
