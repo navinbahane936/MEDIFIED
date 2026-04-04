@@ -11,6 +11,7 @@ export const NANDED_HOSPITALS: HospitalWithBeds[] = [
     distance_km: 0.0,
     phone: '+91-2462-231111',
     is_online: true,
+    login_id: 'YASHO123',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     bed_availability: [
@@ -32,6 +33,7 @@ export const NANDED_HOSPITALS: HospitalWithBeds[] = [
     distance_km: 1.2,
     phone: '+91-2462-232222',
     is_online: true,
+    login_id: 'ICON123',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     bed_availability: [
@@ -53,6 +55,7 @@ export const NANDED_HOSPITALS: HospitalWithBeds[] = [
     distance_km: 2.5,
     phone: '+91-2462-233333',
     is_online: true,
+    login_id: 'AADHAR123',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     bed_availability: [
@@ -74,6 +77,7 @@ export const NANDED_HOSPITALS: HospitalWithBeds[] = [
     distance_km: 3.0,
     phone: '+91-2462-234444',
     is_online: true,
+    login_id: 'RUKHMAI123',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     bed_availability: [
@@ -95,6 +99,7 @@ export const NANDED_HOSPITALS: HospitalWithBeds[] = [
     distance_km: 3.5,
     phone: '+91-2462-235555',
     is_online: true,
+    login_id: 'GLOBAL123',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     bed_availability: [

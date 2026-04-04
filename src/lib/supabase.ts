@@ -19,6 +19,7 @@ export type Hospital = {
   distance_km: number;
   phone: string;
   is_online: boolean;
+  login_id: string;
   created_at: string;
   updated_at: string;
 };

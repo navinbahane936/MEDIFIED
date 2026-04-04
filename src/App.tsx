@@ -10,7 +10,7 @@ import BookingModal from './components/BookingModal';
 import EmergencyView from './components/EmergencyView';
 import HospitalPortal from './components/HospitalPortal';
 import AIChatbot from './components/AIChatbot';
-import { HospitalWithBeds } from './lib/supabase';
+import { HospitalWithBeds, supabase } from './lib/supabase';
 import { NANDED_HOSPITALS } from './data/mockHospitals';
 
 function App() {
@@ -85,10 +85,24 @@ function App() {
 
   const fetchHospitals = async () => {
     try {
-      // Using mock data for Nanded hospitals
-      setHospitals(NANDED_HOSPITALS);
+      const { data, error } = await supabase
+        .from('hospitals')
+        .select(`
+          *,
+          bed_availability (*)
+        `);
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setHospitals(data as HospitalWithBeds[]);
+      } else {
+        // Fallback to mock data if database is empty 
+        setHospitals(NANDED_HOSPITALS);
+      }
     } catch (error) {
       console.error('Error fetching hospitals:', error);
+      setHospitals(NANDED_HOSPITALS);
     } finally {
       setLoading(false);
     }
@@ -105,6 +119,50 @@ function App() {
         })),
       }))
     );
+  };
+
+  const handleUpdateBed = async (hospitalId: string, bedType: string, newAvailable: number) => {
+    // 1. Instantly update the UI so it feels extremely fast
+    let targetBedId: string | undefined;
+    
+    setHospitals(prev => prev.map(hospital => {
+      if (hospital.id === hospitalId) {
+        return {
+          ...hospital,
+          bed_availability: hospital.bed_availability.map(bed => {
+            if (bed.bed_type === bedType) {
+              targetBedId = bed.id;
+              const status = newAvailable <= 2 ? 'CRITICAL' : (newAvailable <= 5 ? 'MODERATE' : 'AVAILABLE');
+              return {
+                ...bed,
+                available_beds: newAvailable,
+                status: status as 'AVAILABLE' | 'MODERATE' | 'CRITICAL',
+                last_updated: new Date().toISOString()
+              };
+            }
+            return bed;
+          })
+        };
+      }
+      return hospital;
+    }));
+
+    // 2. Perform the actual Supabase database row update
+    if (targetBedId) {
+      try {
+        const status = newAvailable <= 2 ? 'CRITICAL' : (newAvailable <= 5 ? 'MODERATE' : 'AVAILABLE');
+        await supabase
+          .from('bed_availability')
+          .update({ 
+            available_beds: newAvailable, 
+            status: status,
+            last_updated: new Date().toISOString()
+          })
+          .eq('id', targetBedId);
+      } catch (error) {
+        console.error("Error pushing update to Supabase", error);
+      }
+    }
   };
 
 
@@ -214,7 +272,12 @@ function App() {
           <EmergencyView hospitals={hospitals} onBookNow={setSelectedHospital} />
         )}
 
-        {activeTab === 'portal' && <HospitalPortal />}
+        {activeTab === 'portal' && (
+          <HospitalPortal 
+            hospitals={hospitals} 
+            onUpdateBed={handleUpdateBed} 
+          />
+        )}
       </main>
 
       {selectedHospital && (

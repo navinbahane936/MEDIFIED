@@ -1,7 +1,6 @@
 import { X, User, Phone, Calendar, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { HospitalWithBeds } from '../lib/supabase';
-import { saveBookingToGoogleSheets, sendBookingToPabblyWebhook } from '../lib/googleSheets';
 
 type BookingModalProps = {
   hospital: HospitalWithBeds | null;
@@ -18,47 +17,42 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
   });
 
   const [submitted, setSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!hospital) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+    setIsSubmitting(true);
 
-    const bookingData = {
-      patientName: formData.patientName,
-      age: formData.age,
-      phone: formData.phone,
-      hospitalName: hospital!.name,
-      bedType: formData.bedType,
-      symptoms: formData.symptoms,
-    };
+    try {
+      const formBody = new URLSearchParams();
+      formBody.append("Name", formData.patientName);
+      formBody.append("Age", formData.age);
+      formBody.append("phone", formData.phone);
+      formBody.append("Bed type", formData.bedType);
+      formBody.append("notes", formData.symptoms);
+      formBody.append("hospitalName", hospital.name);
+      formBody.append("time", new Date().toISOString());
 
-    // Save to Google Sheets
-    const savedToSheets = await saveBookingToGoogleSheets(bookingData);
-
-    // Send to Pabbly webhook for automations (SMS, email, CRM, etc.)
-    const sentToPabbly = await sendBookingToPabblyWebhook(bookingData);
-
-    // Consider success if at least one destination worked
-    const success = savedToSheets || sentToPabbly;
-
-    if (!success) {
-      setError('Failed to process booking. Please check your internet connection and try again.');
-      setIsLoading(false);
-      return;
+      await fetch('https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjcwNTZmMDYzMTA0M2M1MjZhNTUzNTUxMzIi_pc', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody.toString(),
+        mode: 'no-cors'
+      });
+    } catch (error) {
+      console.error('Webhook payload error:', error);
     }
 
-    setIsLoading(false);
+    setIsSubmitting(false);
     setSubmitted(true);
     setTimeout(() => {
       onClose();
       setSubmitted(false);
       setFormData({ patientName: '', age: '', phone: '', bedType: '', symptoms: '' });
-      setError(null);
     }, 2000);
   };
 
@@ -86,15 +80,10 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Booking Confirmed!</h3>
-            <p className="text-slate-400">Credentials saved. The hospital will contact you shortly</p>
+            <p className="text-slate-400">The hospital will contact you shortly</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            {error && (
-              <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-sm">
-                {error}
-              </div>
-            )}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 <User className="w-4 h-4 inline mr-2" />
@@ -178,27 +167,16 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                disabled={isLoading}
-                className="flex-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={isLoading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-colors"
               >
-                {isLoading ? (
-                  <>
-                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" opacity="0.25" />
-                      <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Saving...
-                  </>
-                ) : (
-                  'Confirm Booking'
-                )}
+                {isSubmitting ? 'Confirming...' : 'Confirm Booking'}
               </button>
             </div>
           </form>
