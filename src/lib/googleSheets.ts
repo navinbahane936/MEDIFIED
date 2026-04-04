@@ -1,8 +1,9 @@
-// Google Sheets integration for booking credentials
+// Google Sheets + Webhook integration for booking credentials
 // Make sure to set these environment variables in .env.local
 
 const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID || '';
 const SHEET_NAME = 'Bookings'; // Change if your sheet name is different
+const PABBLY_WEBHOOK_URL = import.meta.env.VITE_PABBLY_WEBHOOK_URL || '';
 
 export interface BookingData {
   patientName: string;
@@ -94,6 +95,57 @@ export async function saveBookingViaBackend(booking: BookingData): Promise<boole
     return true;
   } catch (error) {
     console.error('❌ Error saving booking:', error);
+    return false;
+  }
+}
+
+/**
+ * Send booking data to Pabbly webhook for automation/CRM integration
+ * Pabbly automates email notifications, SMS alerts, CRM updates, etc.
+ * Requires: VITE_PABBLY_WEBHOOK_URL in .env.local
+ */
+export async function sendBookingToPabblyWebhook(booking: BookingData): Promise<boolean> {
+  try {
+    if (!PABBLY_WEBHOOK_URL) {
+      console.warn('Pabbly webhook URL not configured. Skipping webhook notification.');
+      return false;
+    }
+
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
+
+    const webhookPayload = {
+      timestamp,
+      patientName: booking.patientName,
+      age: booking.age,
+      phone: booking.phone,
+      hospitalName: booking.hospitalName,
+      bedType: booking.bedType,
+      symptoms: booking.symptoms,
+      status: 'Pending',
+      bookingId: `BOOK-${Date.now()}`, // Unique booking ID
+    };
+
+    const response = await fetch(PABBLY_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookPayload),
+    });
+
+    if (!response.ok) {
+      console.warn(`Pabbly webhook returned status: ${response.status}`);
+      // Don't throw - webhook failures shouldn't block UX
+      return false;
+    }
+
+    console.log('✅ Booking sent to Pabbly webhook');
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending to Pabbly webhook:', error);
+    // Don't throw - graceful fallback
     return false;
   }
 }

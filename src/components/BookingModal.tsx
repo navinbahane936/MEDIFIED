@@ -1,7 +1,7 @@
 import { X, User, Phone, Calendar, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { HospitalWithBeds } from '../lib/supabase';
-import { saveBookingToGoogleSheets } from '../lib/googleSheets';
+import { saveBookingToGoogleSheets, sendBookingToPabblyWebhook } from '../lib/googleSheets';
 
 type BookingModalProps = {
   hospital: HospitalWithBeds | null;
@@ -28,18 +28,26 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
     setIsLoading(true);
     setError(null);
 
-    // Save to Google Sheets
-    const saved = await saveBookingToGoogleSheets({
+    const bookingData = {
       patientName: formData.patientName,
       age: formData.age,
       phone: formData.phone,
       hospitalName: hospital!.name,
       bedType: formData.bedType,
       symptoms: formData.symptoms,
-    });
+    };
 
-    if (!saved) {
-      setError('Failed to save booking. Please try again.');
+    // Save to Google Sheets
+    const savedToSheets = await saveBookingToGoogleSheets(bookingData);
+
+    // Send to Pabbly webhook for automations (SMS, email, CRM, etc.)
+    const sentToPabbly = await sendBookingToPabblyWebhook(bookingData);
+
+    // Consider success if at least one destination worked
+    const success = savedToSheets || sentToPabbly;
+
+    if (!success) {
+      setError('Failed to process booking. Please check your internet connection and try again.');
       setIsLoading(false);
       return;
     }
