@@ -1,6 +1,7 @@
 import { X, User, Phone, Calendar, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { HospitalWithBeds } from '../lib/supabase';
+import { saveBookingToGoogleSheets } from '../lib/googleSheets';
 
 type BookingModalProps = {
   hospital: HospitalWithBeds | null;
@@ -17,16 +18,39 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!hospital) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    // Save to Google Sheets
+    const saved = await saveBookingToGoogleSheets({
+      patientName: formData.patientName,
+      age: formData.age,
+      phone: formData.phone,
+      hospitalName: hospital!.name,
+      bedType: formData.bedType,
+      symptoms: formData.symptoms,
+    });
+
+    if (!saved) {
+      setError('Failed to save booking. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
     setSubmitted(true);
     setTimeout(() => {
       onClose();
       setSubmitted(false);
       setFormData({ patientName: '', age: '', phone: '', bedType: '', symptoms: '' });
+      setError(null);
     }, 2000);
   };
 
@@ -54,10 +78,15 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Booking Confirmed!</h3>
-            <p className="text-slate-400">The hospital will contact you shortly</p>
+            <p className="text-slate-400">Credentials saved. The hospital will contact you shortly</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {error && (
+              <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-sm">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 <User className="w-4 h-4 inline mr-2" />
@@ -141,15 +170,27 @@ export default function BookingModal({ hospital, onClose }: BookingModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                disabled={isLoading}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                disabled={isLoading}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
               >
-                Confirm Booking
+                {isLoading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" opacity="0.25" />
+                      <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  'Confirm Booking'
+                )}
               </button>
             </div>
           </form>
