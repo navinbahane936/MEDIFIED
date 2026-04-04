@@ -7,7 +7,7 @@
   ## New Tables
 
   ### `hospitals`
-  Stores information about hospitals in the Mumbai region
+  Stores information about hospitals in the Nanded region
   - `id` (uuid, primary key) - Unique hospital identifier
   - `name` (text) - Hospital name
   - `location` (text) - Area/location name

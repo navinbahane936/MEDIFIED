@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import AlertBanner from './components/AlertBanner';
@@ -9,7 +9,9 @@ import MapSection from './components/MapSection';
 import BookingModal from './components/BookingModal';
 import EmergencyView from './components/EmergencyView';
 import HospitalPortal from './components/HospitalPortal';
-import { supabase, HospitalWithBeds } from './lib/supabase';
+import AIChatbot from './components/AIChatbot';
+import { HospitalWithBeds } from './lib/supabase';
+import { NANDED_HOSPITALS } from './data/mockHospitals';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'find' | 'emergency' | 'portal'>('find');
@@ -20,6 +22,7 @@ function App() {
   const [selectedHospital, setSelectedHospital] = useState<HospitalWithBeds | null>(null);
   const [loading, setLoading] = useState(true);
   const [criticalAlert, setCriticalAlert] = useState<string | null>(null);
+  const [chatbotRecommendedBeds, setChatbotRecommendedBeds] = useState<string[] | null>(null);
 
   useEffect(() => {
     fetchHospitals();
@@ -27,62 +30,18 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    filterHospitals();
-  }, [hospitals, selectedBedType, searchQuery]);
-
-  useEffect(() => {
-    checkCriticalAlerts();
-  }, [hospitals]);
-
-  const fetchHospitals = async () => {
-    try {
-      const { data: hospitalsData, error: hospitalsError } = await supabase
-        .from('hospitals')
-        .select('*')
-        .eq('is_online', true)
-        .order('distance_km');
-
-      if (hospitalsError) throw hospitalsError;
-
-      const { data: bedsData, error: bedsError } = await supabase
-        .from('bed_availability')
-        .select('*');
-
-      if (bedsError) throw bedsError;
-
-      const hospitalsWithBeds = (hospitalsData || []).map((hospital) => ({
-        ...hospital,
-        bed_availability: (bedsData || []).filter((bed) => bed.hospital_id === hospital.id),
-      }));
-
-      setHospitals(hospitalsWithBeds);
-    } catch (error) {
-      console.error('Error fetching hospitals:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const simulateRealTimeUpdate = async () => {
-    const { data: bedsData } = await supabase
-      .from('bed_availability')
-      .select('*');
-
-    if (bedsData) {
-      setHospitals((prev) =>
-        prev.map((hospital) => ({
-          ...hospital,
-          bed_availability: bedsData.filter((bed) => bed.hospital_id === hospital.id),
-        }))
-      );
-    }
-  };
-
-  const filterHospitals = () => {
+  const filterHospitals = useCallback(() => {
     let filtered = [...hospitals];
 
-    if (selectedBedType !== 'All Beds') {
+    // Apply chatbot recommendation filter first (if active)
+    if (chatbotRecommendedBeds && chatbotRecommendedBeds.length > 0) {
+      filtered = filtered.filter((hospital) =>
+        hospital.bed_availability.some(
+          (bed) => chatbotRecommendedBeds.includes(bed.bed_type) && bed.available_beds > 0
+        )
+      );
+    } else if (selectedBedType !== 'All Beds') {
+      // Apply manual bed type filter if no chatbot recommendation
       filtered = filtered.filter((hospital) =>
         hospital.bed_availability.some(
           (bed) => bed.bed_type === selectedBedType && bed.available_beds > 0
@@ -99,9 +58,9 @@ function App() {
     }
 
     setFilteredHospitals(filtered);
-  };
+  }, [hospitals, selectedBedType, searchQuery, chatbotRecommendedBeds]);
 
-  const checkCriticalAlerts = () => {
+  const checkCriticalAlerts = useCallback(() => {
     const criticalHospital = hospitals.find((hospital) =>
       hospital.bed_availability.some(
         (bed) => bed.bed_type === 'ICU' && bed.available_beds <= 2 && bed.available_beds > 0
@@ -114,7 +73,41 @@ function App() {
         `${criticalHospital.name} ICU almost full - only ${icuBed?.available_beds} beds left. Book now.`
       );
     }
+  }, [hospitals]);
+
+  useEffect(() => {
+    filterHospitals();
+  }, [filterHospitals]);
+
+  useEffect(() => {
+    checkCriticalAlerts();
+  }, [checkCriticalAlerts]);
+
+  const fetchHospitals = async () => {
+    try {
+      // Using mock data for Nanded hospitals
+      setHospitals(NANDED_HOSPITALS);
+    } catch (error) {
+      console.error('Error fetching hospitals:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const simulateRealTimeUpdate = async () => {
+    // Simulate real-time updates with mock data
+    setHospitals(prev =>
+      prev.map(hospital => ({
+        ...hospital,
+        bed_availability: hospital.bed_availability.map(bed => ({
+          ...bed,
+          last_updated: new Date().toISOString(),
+        })),
+      }))
+    );
+  };
+
+
 
   const calculateStats = () => {
     const icuBeds = hospitals.reduce(
@@ -147,6 +140,14 @@ function App() {
 
   const stats = calculateStats();
 
+  const handleChatbotRecommendation = (recommendedBeds: string[]) => {
+    setChatbotRecommendedBeds(recommendedBeds);
+  };
+
+  const clearChatbotRecommendation = () => {
+    setChatbotRecommendedBeds(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <Header />
@@ -156,6 +157,14 @@ function App() {
         {activeTab === 'find' && (
           <>
             {criticalAlert && <AlertBanner message={criticalAlert} severity="critical" />}
+
+            {chatbotRecommendedBeds && (
+              <AlertBanner
+                message={`📋 Showing hospitals with recommended bed type: ${chatbotRecommendedBeds.join(', ')}. Click here to clear filter.`}
+                severity="informational"
+                onDismiss={clearChatbotRecommendation}
+              />
+            )}
 
             <StatsDashboard stats={stats} />
 
@@ -211,6 +220,9 @@ function App() {
       {selectedHospital && (
         <BookingModal hospital={selectedHospital} onClose={() => setSelectedHospital(null)} />
       )}
+
+      {/* AI Medical Triage Chatbot */}
+      <AIChatbot onRecommendationChange={handleChatbotRecommendation} />
     </div>
   );
 }

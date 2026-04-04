@@ -18,7 +18,7 @@ export default function Header() {
             <Activity className="w-4 h-4 md:w-5 md:h-5 text-green-400" />
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
           </div>
-          <span className="text-xs md:text-sm font-medium text-green-300">LIVE - Mumbai Region</span>
+          <span className="text-xs md:text-sm font-medium text-green-300">LIVE - Nanded Region</span>
         </div>
       </div>
     </header>
